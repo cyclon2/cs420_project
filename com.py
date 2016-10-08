@@ -208,7 +208,6 @@ def p_IdentList(t):
 def p_identifier(t):
 	'''identifier : ID 
 				| ID LBRK INTNUM RBRK '''
-	
 
 def p_Function(t):
 	'''Function : Type ID LPAREN RPAREN CompoundStmt
@@ -331,7 +330,9 @@ while True:
 		break
 	parser.parse(s)
 '''
-
-f = open("test.txt")
+s = input("file name : ")
+f = open(s)
 l = f.read()
+l = l.replace('\n', ' ')
+
 parser.parse(l)
