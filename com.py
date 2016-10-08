@@ -117,9 +117,7 @@ precedence = (
 	('left', 'PLUS', 'MINUS'),
 	('left', 'TIMES', 'DIVIDE'),
 	('right','UMINUS'),
-	('right', 'EQUALS'),
 )
-
 # dictionary of names
 
 
@@ -128,51 +126,52 @@ def p_Program(t):
 			| DeclList
 			| FuncList 
 			|  '''
-	print("program" )
+	print("program" , t.slice)
 
 def p_DeclList(t):
 	'''DeclList : Declaration 
 			| DeclList Declaration'''
-	print("DeclList")
+	print("DeclList ", t.slice)
 
 def p_FuncList(t):
 	'''FuncList : Function
 			| FuncList Function'''
-	print("FucnList")
+	print("FucnList ", t.slice)
 
 def p_Declaration(t):
 	'Declaration : Type IdentList SEMICOLON'
-	print("Declaration")
+	print("Declaration : ", t.slice)
 
 def p_IdentList(t):
 	'''IdentList : identifier 
 			| IdentList COMMA identifier'''
-	print("IdentList")
+	print("IdentList : ", t.slice)
 
 def p_identifier(t):
 	'''identifier : ID 
 				| ID LBRK INTNUM RBRK '''
-	print("identifier : ", t[1])
+	print("identifier : ", t.slice)
+	
 
 def p_Function(t):
 	'''Function : Type ID LPAREN RPAREN CompoundStmt
 			| Type ID LPAREN ParamList RPAREN CompoundStmt'''
-	print("Function :", t[1], t[2])
+	print("Function :", t.slice)
 
 def p_ParamList(t):
 	'''ParamList : Type identifier
 			| ParamList COMMA Type identifier'''
-	print("paramList", t[1], t[2])
+	print("paramList", t.slice)
 
 def p_Type(t):
 	'''Type : INT
 			| FLOAT'''
-	print("type : ", t[1])
+	print("type : ", t.stack, t.slice)
 
 def p_CompoundStmt(t):
 	'''CompoundStmt : LBRACE DeclList StmtList RBRACE
 			| LBRACE StmtList RBRACE'''
-	print("CompoundStmt")
+	print("CompoundStmt : ", t.slice)
 
 def p_StmtList(t):
 	'''StmtList : Stmt StmtList
@@ -187,48 +186,48 @@ def p_Stmt(t):
 			| SwitchStmt
 			| CompoundStmt 
 			| SEMICOLON'''
-	print("Stmt")
+	print("Stmt ", t.slice)
 
 def p_AssignStmt(t):
 	'AssignStmt : Assign SEMICOLON'
-	print("AssignStmt")
+	print("AssignStmt : ", t.slice)
 
 def p_Assign(t):
 	'''Assign : ID EQUALS Expr
 			| ID LBRK Expr RBRK EQUALS Expr'''
-	print("Assign")
+	print("Assign : ", t.slice)
 
 def p_CallStmt(t):
 	'CallStmt : Call SEMICOLON'
-	print("CallStmt")
+	print("CallStmt : ",t.slice)
 
 def p_Call(t):
 	'''Call : ID LPAREN ArgList RPAREN
 			| ID LPAREN RPAREN'''
-	print("CAll : ", t[1])
+	print("CAll : ", t.slice)
 
 def p_RetStmt(t):
 	'''RetStmt : RETURN SEMICOLON
 			| RETURN Expr SEMICOLON'''
-	print("RetStmt")
+	print("RetStmt ", t.slice)
 
 def p_WhileStmt(t):
 	'''WhileStmt : WHILE LPAREN Expr RPAREN Stmt
 			| DO Stmt WHILE LPAREN Expr RPAREN'''
-	print("Whilestmt")
+	print("Whilestmt ", t.slice)
 
 def p_ForStmt(t):
 	'ForStmt : FOR LPAREN Assign SEMICOLON Expr SEMICOLON Assign RPAREN Stmt'
-	print("for")
+	print("for ",  t.slice)
 
 def p_IfStmt(t):
 	'''IfStmt : IF LPAREN Expr RPAREN Stmt
 			| IF LPAREN Expr RPAREN Stmt ELSE Stmt'''
-	print("IF else")
+	print("IF else : ", t.slice)
 
 def p_SwitchStmt(t):
 	'''SwitchStmt : SWITCH LPAREN identifier RPAREN LBRACE CaseList RBRACE'''
-	print("switch")
+	print("switch : ", t.slice)
 
 def p_CaseList(t):
 	'''CaseList : CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList BREAK SEMICOLON
@@ -243,7 +242,7 @@ def p_CaseList(t):
 			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList
 			| CASE INTNUM COLON StmtList BREAK SEMICOLON
 			| CASE INTNUM COLON StmtList'''
-	print("case")
+	print("case : ", t.slice)
 
 def p_Expr(t):
 	'''Expr : Unop
@@ -254,11 +253,11 @@ def p_Expr(t):
 			| ID 
 			| ID LBRK Expr RBRK 
 			| LPAREN Expr RPAREN'''
-	print("expr : ", t[1])
+	print("expr : ", t.slice)
 
 def p_unop(t):
 	'Unop : MINUS Expr %prec UMINUS'
-	print("unop : ",t[1])
+	print("unop : ",t.slice)
 
 def p_Bioperation(t):
 	'''Bioperation : Expr PLUS Expr
@@ -271,11 +270,11 @@ def p_Bioperation(t):
 			| Expr LE Expr
 			| Expr EQ Expr
 			| Expr NE Expr'''
-
+	print("bioper : ", t.slice)
 def p_ArgList(t):
 	'''ArgList : Expr
 			| ArgList COMMA Expr'''
-
+	print(t.slice)
 
 def p_error(t):
 	print("Syntax error at '%s'" % t.value)
@@ -287,7 +286,7 @@ parser = yacc.yacc()
 
 while True:
 	try:
-		s = input('calc > ')
+		s = input('>> ')
 	except EOFError:
 		break
 	parser.parse(s)
