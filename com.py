@@ -50,7 +50,7 @@ t_ELSE = r'else'
 t_SWITCH = r'switch'
 t_CASE = r'case'
 t_DEFAULT = r'default'
-t_BREAK = r'break;'
+t_BREAK = r'break'
 
 
 
@@ -92,7 +92,7 @@ def t_ID(t):
 	elif t.value == 'default':
 		t.type = 'DEFAULT'
 	
-	elif t.value == 'break;':
+	elif t.value == 'break':
 		t.type = 'BREAK'	
 
 	return t
@@ -117,6 +117,7 @@ precedence = (
 	('left', 'PLUS', 'MINUS'),
 	('left', 'TIMES', 'DIVIDE'),
 	('right','UMINUS'),
+	('right', 'EQUALS'),
 )
 
 # dictionary of names
@@ -127,7 +128,7 @@ def p_Program(t):
 			| DeclList
 			| FuncList 
 			|  '''
-	print("program")
+	print("program" )
 
 def p_DeclList(t):
 	'''DeclList : Declaration 
@@ -230,17 +231,17 @@ def p_SwitchStmt(t):
 	print("switch")
 
 def p_CaseList(t):
-	'''CaseList : CaseList CASE INTNUM COLON StmtList BREAK DEFAULT COLON StmtList BREAK
-			| CaseList CASE INTNUM COLON StmtList BREAK DEFAULT COLON StmtList
-			| CaseList CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK
+	'''CaseList : CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList BREAK SEMICOLON
+			| CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList
+			| CaseList CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK SEMICOLON
 			| CaseList CASE INTNUM COLON StmtList DEFAULT COLON StmtList
-			| CaseList CASE INTNUM COLON StmtList BREAK
+			| CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON
 			| CaseList CASE INTNUM COLON StmtList
-			| CASE INTNUM COLON StmtList BREAK DEFAULT COLON StmtList BREAK
-			| CASE INTNUM COLON StmtList BREAK DEFAULT COLON StmtList
-			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK
+			| CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList BREAK SEMICOLON
+			| CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList
+			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK SEMICOLON
 			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList
-			| CASE INTNUM COLON StmtList BREAK
+			| CASE INTNUM COLON StmtList BREAK SEMICOLON
 			| CASE INTNUM COLON StmtList'''
 	print("case")
 
@@ -253,7 +254,7 @@ def p_Expr(t):
 			| ID 
 			| ID LBRK Expr RBRK 
 			| LPAREN Expr RPAREN'''
-	print("expr")
+	print("expr : ", t[1])
 
 def p_unop(t):
 	'Unop : MINUS Expr %prec UMINUS'
