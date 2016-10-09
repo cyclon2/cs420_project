@@ -1,0 +1,19 @@
+int var1, var2;
+float var3[10];
+
+int f(int in)
+{
+	int var4;
+	float var5[10];
+	while(1)
+	{
+		int a;
+		int var7;
+		float var6[2];
+		{
+			int var8;
+			float var[2];
+			a = -1;
+		}
+	}
+}

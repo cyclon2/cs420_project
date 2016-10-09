@@ -123,6 +123,7 @@ def t_RBRACE(t):
 
 def t_ID(t):
 	r'[A-Za-z][A-Za-z0-9_]*'
+	a = 0;
 	if t.value == 'int':
 		t.type = 'INT'
 	
@@ -157,8 +158,13 @@ def t_ID(t):
 		t.type = 'DEFAULT'
 	
 	elif t.value == 'break':
-		t.type = 'BREAK'	
-	print(t.value, end= " ")
+		t.type = 'BREAK'
+		print(t.value, end = "")
+		a = 1;
+	else:
+		print(t.value, end = "")
+		a = 1;
+	if a == 0 : print(t.value, end= " ")
 	return t
 
 def t_newline(t):
@@ -332,9 +338,11 @@ while True:
 		break
 	parser.parse(s)
 '''
-s = input("file name : ")
-f = open(s)
-l = f.read()
-l = l.replace('\n', ' ')
-
-parser.parse(l)
+while True:
+	try:
+		s = input("file name : ")
+		f = open(s)
+		l = f.read()
+	except:
+		break;
+	parser.parse(l)
