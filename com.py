@@ -11,13 +11,14 @@ tokens = (
 
 t_ignore = " \t"
 
-def t_INTNUM(t):
-	r'[0-9]+'
+
+def t_FLOATNUM(t):
+	r'[0-9]+\.[0-9]+'
 	print(t.value, end="")
 	return t
 
-def t_FLOATNUM(t):
-	r'[0-9]+.[0-9]+'
+def t_INTNUM(t):
+	r'[0-9]+'
 	print(t.value, end="")
 	return t
 
@@ -344,5 +345,6 @@ while True:
 		f = open(s)
 		l = f.read()
 	except:
+		print("file error")
 		break;
 	parser.parse(l)
