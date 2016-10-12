@@ -13,7 +13,7 @@ int f(int in)
 		{
 			int var8;
 			float var[2];
-			a = -1;
+			a = -1;			
 		}
 	}
 }

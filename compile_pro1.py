@@ -43,17 +43,17 @@ def t_DIVIDE(t):
 	return t
 
 def t_EQUALS(t):
-	r'='
+	r'=[^=]'
 	print(t.value, end=" ")
 	return t
 
 def t_LT(t):
-	r'<'
+	r'<[^=]'
 	print(t.value, end=" ")
 	return t
 
 def t_GT(t):
-	r'>'
+	r'>[^=]'
 	print(t.value, end=" ")
 	return t
 
@@ -72,7 +72,7 @@ def t_EQ(t):
 	print(t.value, end=" ")
 	return t
 
-def t_NQ(t):
+def t_NE(t):
 	r'!='
 	print(t.value, end=" ")
 	return t
@@ -145,7 +145,6 @@ def t_ID(t):
 
 	elif t.value == 'if':
 		t.type = 'IF'
-	
 	elif t.value == 'else':
 		t.type = 'ELSE'
 
@@ -184,11 +183,15 @@ lexer = lex.lex()
 # Parsing rules
 
 precedence = (
+	('nonassoc', 'IFX'),
+	('nonassoc', 'ELSE'),
+	('right', 'EQUALS'),
 	('left', 'EQ', 'NE'),
 	('left', 'GT', 'GE', 'LT', 'LE'),
 	('left', 'PLUS', 'MINUS'),
 	('left', 'TIMES', 'DIVIDE'),
 	('right','UMINUS'),
+	('left', 'LPAREN', 'RPAREN'),
 )
 # dictionary of names
 def p_Program(t):
@@ -214,7 +217,7 @@ def p_IdentList(t):
 
 def p_identifier(t):
 	'''identifier : ID 
-				| ID LBRK INTNUM RBRK '''
+				| ID LBRK INTNUM RBRK'''
 
 def p_Function(t):
 	'''Function : Type ID LPAREN RPAREN CompoundStmt
@@ -267,15 +270,14 @@ def p_RetStmt(t):
 
 def p_WhileStmt(t):
 	'''WhileStmt : WHILE LPAREN Expr RPAREN Stmt
-			| DO Stmt WHILE LPAREN Expr RPAREN'''
+			| DO Stmt WHILE LPAREN Expr RPAREN SEMICOLON'''
 
 def p_ForStmt(t):
 	'ForStmt : FOR LPAREN Assign SEMICOLON Expr SEMICOLON Assign RPAREN Stmt'
 
 def p_IfStmt(t):
-	'''IfStmt : IF LPAREN Expr RPAREN Stmt
+	'''IfStmt : IF LPAREN Expr RPAREN Stmt %prec IFX
 			| IF LPAREN Expr RPAREN Stmt ELSE Stmt'''
-
 def p_SwitchStmt(t):
 	'''SwitchStmt : SWITCH LPAREN identifier RPAREN LBRACE CaseList RBRACE'''
 
@@ -342,9 +344,11 @@ while True:
 while True:
 	try:
 		s = input("file name : ")
+		if s == "exit":
+			break
 		f = open(s)
 		l = f.read()
 	except:
-		print("file error")
+		print("There is no such file")
 		break;
 	parser.parse(l)
