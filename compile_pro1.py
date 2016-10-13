@@ -14,112 +14,112 @@ t_ignore = " \t"
 
 def t_FLOATNUM(t):
 	r'[0-9]+\.[0-9]+'
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_INTNUM(t):
 	r'[0-9]+'
-	print(t.value, end="")
+	if p == "-p":print(t.value, end="")
 	return t
 
 def t_PLUS(t):
 	r'\+'
-	print(t.value, end=" ")
+	if p == "-p":print(t.value, end=" ")
 	return t
 
 def t_MINUS(t):
 	r'-'
-	print(t.value, end=" ")
+	if p == "-p":print(t.value, end=" ")
 	return t
 
 def t_TIMES(t):
 	r'\*'
-	print(t.value, end=" ")
+	if p == "-p":print(t.value, end=" ")
 	return t
 
 def t_DIVIDE(t):
 	r'/'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_EQUALS(t):
 	r'=[^=]'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_LT(t):
 	r'<[^=]'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_GT(t):
 	r'>[^=]'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_LE(t):
 	r'<='
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_GE(t):
 	r'>='
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_EQ(t):
 	r'=='
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_NE(t):
 	r'!='
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_COMMA(t):
 	r','
-	print(t.value, end =" ")
+	if p == "-p": print(t.value, end =" ")
 	return t
 
 def t_SEMICOLON(t):
 	r';'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_COLON(t):
 	r':'
-	print(t.value, end=" ")
+	if p == "-p": print(t.value, end=" ")
 	return t
 
 def t_LPAREN(t):
 	r'\('
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_RPAREN(t):
 	r'\)'
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_LBRK(t):
 	r'\['
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_RBRK(t):
 	r'\]'
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_LBRACE(t):
 	r'\{'
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_RBRACE(t):
 	r'\}'
-	print(t.value, end="")
+	if p == "-p": print(t.value, end="")
 	return t
 
 def t_ID(t):
@@ -159,17 +159,19 @@ def t_ID(t):
 	
 	elif t.value == 'break':
 		t.type = 'BREAK'
-		print(t.value, end = "")
+		if p == "-p": print(t.value, end = "")
 		a = 1;
 	else:
-		print(t.value, end = "")
+		if p == "-p": print(t.value, end = "")
 		a = 1;
-	if a == 0 : print(t.value, end= " ")
+	if a == 0 : 
+		if p == "-p":
+			print(t.value, end= " ")
 	return t
 
 def t_newline(t):
 	r'\n+'
-	print()
+	if p == "-p": print()
 	t.lexer.lineno += t.value.count("\n")
 
 def t_error(t):
@@ -327,6 +329,7 @@ def p_ArgList(t):
 			| ArgList COMMA Expr'''
 
 def p_error(t):
+	print()
 	print("Syntax error at '%s'" % t.value)
 
 
@@ -343,7 +346,12 @@ while True:
 '''
 while True:
 	try:
-		s = input("file name : ")
+		global p
+		p = None
+		cmd = input(">> ")
+		s = cmd.split(" ")[0].strip()
+		if(len(cmd.split(" ")) == 2):
+			p = cmd.split(" ")[1]
 		if s == "exit":
 			break
 		f = open(s)
