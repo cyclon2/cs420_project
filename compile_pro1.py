@@ -42,18 +42,8 @@ def t_DIVIDE(t):
 	if p == "-p": print(t.value, end=" ")
 	return t
 
-def t_EQUALS(t):
-	r'=[^=]'
-	if p == "-p": print(t.value, end=" ")
-	return t
-
-def t_LT(t):
-	r'<[^=]'
-	if p == "-p": print(t.value, end=" ")
-	return t
-
-def t_GT(t):
-	r'>[^=]'
+def t_EQ(t):
+	r'=='
 	if p == "-p": print(t.value, end=" ")
 	return t
 
@@ -67,15 +57,25 @@ def t_GE(t):
 	if p == "-p": print(t.value, end=" ")
 	return t
 
-def t_EQ(t):
-	r'=='
-	if p == "-p": print(t.value, end=" ")
-	return t
-
 def t_NE(t):
 	r'!='
 	if p == "-p": print(t.value, end=" ")
 	return t
+def t_EQUALS(t):
+	r'='
+	if p == "-p": print(t.value, end=" ")
+	return t
+
+def t_LT(t):
+	r'<'
+	if p == "-p": print(t.value, end=" ")
+	return t
+
+def t_GT(t):
+	r'>'
+	if p == "-p": print(t.value, end=" ")
+	return t
+
 
 def t_COMMA(t):
 	r','
@@ -280,6 +280,7 @@ def p_ForStmt(t):
 def p_IfStmt(t):
 	'''IfStmt : IF LPAREN Expr RPAREN Stmt %prec IFX
 			| IF LPAREN Expr RPAREN Stmt ELSE Stmt'''
+
 def p_SwitchStmt(t):
 	'''SwitchStmt : SWITCH LPAREN identifier RPAREN LBRACE CaseList RBRACE'''
 
