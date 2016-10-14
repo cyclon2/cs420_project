@@ -297,7 +297,8 @@ def p_CaseList(t):
 			| CASE INTNUM COLON StmtList BREAK SEMICOLON
 			| CASE INTNUM COLON StmtList
 			| DEFAULT COLON StmtList BREAK SEMICOLON
-			| DEFAULT COLON StmtList'''
+			| DEFAULT COLON StmtList
+			| '''
 
 def p_Expr(t):
 	'''Expr : Unop
