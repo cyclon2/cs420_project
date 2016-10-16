@@ -285,21 +285,16 @@ def p_SwitchStmt(t):
 	'''SwitchStmt : SWITCH LPAREN identifier RPAREN LBRACE CaseList RBRACE'''
 
 def p_CaseList(t):
-	'''CaseList : CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList BREAK SEMICOLON
-			| CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList
-			| CaseList CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK SEMICOLON
-			| CaseList CASE INTNUM COLON StmtList DEFAULT COLON StmtList
-			| CaseList CASE INTNUM COLON StmtList BREAK SEMICOLON
-			| CaseList CASE INTNUM COLON StmtList
-			| CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList BREAK SEMICOLON
-			| CASE INTNUM COLON StmtList BREAK SEMICOLON DEFAULT COLON StmtList
-			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList BREAK SEMICOLON
-			| CASE INTNUM COLON StmtList DEFAULT COLON StmtList
-			| CASE INTNUM COLON StmtList BREAK SEMICOLON
-			| CASE INTNUM COLON StmtList
-			| DEFAULT COLON StmtList BREAK SEMICOLON
-			| DEFAULT COLON StmtList
+	'''CaseList : CaseStmt CaseList
+			| DefaultStmt
 			| '''
+def p_CaseStmt(t):
+	'''CaseStmt : CASE INTNUM COLON StmtList BREAK SEMICOLON
+			| CASE INTNUM COLON StmtList'''
+
+def p_DefaultStmt(t):
+	'''DefaultStmt : DEFAULT COLON StmtList BREAK SEMICOLON
+			| DEFAULT COLON StmtList'''
 
 def p_Expr(t):
 	'''Expr : Unop
