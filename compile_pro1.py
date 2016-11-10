@@ -1,3 +1,5 @@
+import sys
+
 import Node as n
 import dfs_search as dfs
 tokens = (
@@ -180,8 +182,8 @@ def p_Program(t):
 		t[0] = n.Program(t[1], t[2])
 	else:
 		print("program error!")
-
-	dfs.Program_dfs(t[0], p)
+	
+	dfs.Program_dfs(t[0], option)
 
 def p_DeclList(t):
 	'''DeclList : Declaration 
@@ -422,19 +424,19 @@ while True:
 		break
 	parser.parse(s)
 '''
-while True:
-	try:
-		global p
-		p = None
-		cmd = input(">> ")
-		s = cmd.split(" ")[0].strip()
-		if(len(cmd.split(" ")) == 2):
-			p = cmd.split(" ")[1]
-		if s == "exit":
-			break
-		f = open(s)
-		l = f.read()
-	except:
-		print("There is no such file")
-		break;
-	parser.parse(l)
+
+try:
+	global option
+	if len(sys.argv) == 3:
+		option = sys.argv[1]	
+		file_name = sys.argv[2]
+	elif len(sys.argv) == 2:
+		option = None
+		file_name= sys.argv[1]
+	else:
+		print(len(sys.argv))
+	f = open(file_name)
+	l = f.read()
+except:
+	print("There is no such file")
+parser.parse(l)

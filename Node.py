@@ -1,4 +1,3 @@
-import tok as t
 
 class Expr : pass
 

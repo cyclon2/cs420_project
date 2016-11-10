@@ -58,13 +58,14 @@ def Identlist_dfs(node, dec_type):
 		identifier_dfs(node.identifier, dec_type, False)
 
 def identifier_dfs(node, dec_type, isparam):
-	if p == "-s" :  print("Type :",dec_type, "\t", end="")
-	if node.intnum is not None:
-		if p == "-s" :  print(node.id, "\t", node.intnum,"\t", "parameter" if isparam else "variable")
-		if p == "-p": print(node.id+ "["+ node.intnum+ "]", end ="")
-	else:
-		if p == "-s" : print(node.id, "\t", "\t",  "parameter" if isparam else "variable")
-		if p == "-p": print(node.id, end = "")
+	if dec_type != None:
+		if p == "-s" :  print(dec_type, "\t", end="")
+		if node.intnum is not None:
+			if p == "-s" :  print(node.id, "\t", node.intnum,"\t", "parameter" if isparam else "variable")
+			if p == "-p": print(node.id+ "["+ node.intnum+ "]", end ="")
+		else:
+			if p == "-s" : print(node.id, "\t", "\t",  "parameter" if isparam else "variable")
+			if p == "-p": print(node.id, end = "")
 
 def Function_dfs(node):
 	if node.paramlist is not None:
