@@ -160,7 +160,7 @@ class DefaultStmt(Expr):
 class Expression(Expr):	
 	def __init__(self, expr, id_expr = None, isPAREN = False):
 		self.type = "expression"
-		self.expr =expr
+		self.expr = expr
 		self.id_expr = id_expr
 		self.isPAREN = isPAREN
 

@@ -29,8 +29,8 @@ def Program_dfs(node, pw):
 
 def Decllist_dfs(node):
 	if node.decllist is not None:
-		Declaration_dfs(node.declaration)
 		Decllist_dfs(node.decllist)
+		Declaration_dfs(node.declaration)
 	else:
 		Declaration_dfs(node.declaration)
 
@@ -123,7 +123,9 @@ def Stmtlist_dfs(node, function_name, beforecmpd):
 		pass
 
 def Stmt_dfs(node, function_name, beforecmpd):
-	if node.stmt.type == "assignstmt":
+	if type (node.stmt) == str:
+		if p == "-p": print(";")
+	elif node.stmt.type == "assignstmt":
 		Assignstmt_dfs(node.stmt)
 	elif node.stmt.type == "callstmt":
 		Callstmt_dfs(node.stmt)
@@ -285,7 +287,8 @@ def Expr_dfs(node):
 			if p == "-p": print("]")
 
 def Unop_dfs(node):
-	if p == "-p": print(node.value, end="")
+	if p == "-p": print("-", end="")
+	Expr_dfs(node.value)
 	pass
 
 def Binop_dfs(node):

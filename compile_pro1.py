@@ -381,7 +381,7 @@ def p_Expr(t):
 
 def p_unop(t):
 	'Unop : MINUS Expr %prec UMINUS'
-	t[0] = Unop(-t[2])
+	t[0] = n.Unop(t[2])
 
 def p_Bioperation(t):
 	'''Bioperation : Expr PLUS Expr
