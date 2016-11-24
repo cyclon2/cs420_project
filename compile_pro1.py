@@ -440,3 +440,4 @@ try:
 except:
 	print("There is no such file")
 parser.parse(l)
+dfs.print_st()

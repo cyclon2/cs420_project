@@ -9,17 +9,30 @@ def lookup_fname(function_name):
 		name_table[function_name] = 1
 		return 1
 
+
+class symbol:
+	def __init__(self,id="", type="", array=None, role=""):
+		self.id = id
+		self.type = type
+		self.array = None
+		self.role = role
+class scope:
+	def __init__(self, function_name="global", symbols=[]):
+		self.function_name =function_name
+		self.symbols =[]
+symbol_table = []
+
 def Program_dfs(node, pw):
 	global p
 	p = pw
 	name_table.clear()
 	if node.second_list is not None and node.first_list is not None:
-		if p == "-s" : print("Function name : Global")
+		symbol_table.append(scope())
 		Decllist_dfs(node.first_list)
 		Funclist_dfs(node.second_list)
 	elif node.first_list is not None:
 		if node.first_list.type == "decllist":
-			if p == "-s" :  print("Function name : Global")
+			symbol_table.append(scope())
 			Decllist_dfs(node.first_list)
 		else :
 			Funclist_dfs(node.first_list)
@@ -59,26 +72,39 @@ def Identlist_dfs(node, dec_type):
 
 def identifier_dfs(node, dec_type, isparam):
 	if dec_type != None:
-		if p == "-s" :  print(dec_type, "\t", end="")
+		symbol_table[-1].symbols.append(symbol(type =dec_type ))
 		if node.intnum is not None:
-			if p == "-s" :  print(node.id, "\t", node.intnum,"\t", "parameter" if isparam else "variable")
+			if isparam :
+				symbol_table[-1].symbols[-1].id = node.id
+				symbol_table[-1].symbols[-1].array = node.intnum
+				symbol_table[-1].symbols[-1].role = "parameter"
+			else : 
+				symbol_table[-1].symbols[-1].id = node.id
+				symbol_table[-1].symbols[-1].array = node.intnum
+				symbol_table[-1].symbols[-1].role = "variable"
 			if p == "-p": print(node.id+ "["+ node.intnum+ "]", end ="")
 		else:
-			if p == "-s" : print(node.id, "\t", "\t",  "parameter" if isparam else "variable")
+			if isparam:
+				symbol_table[-1].symbols[-1].id = node.id
+				symbol_table[-1].symbols[-1].role = "parameter"
+			else : 
+				symbol_table[-1].symbols[-1].id = node.id
+				symbol_table[-1].symbols[-1].role = "variable"
+
 			if p == "-p": print(node.id, end = "")
 
 def Function_dfs(node):
 	if node.paramlist is not None:
 		Type_dfs(node.func_type)
 		if p == "-p": print(node.id+ "(", end="")
-		if p == "-s" : print("Function name :", node.id)
+		symbol_table.append(scope(function_name = node.id))
 		Paramlist_dfs(node.paramlist)
 		if p == "-p": print(")", end="")
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 	else:
 		Type_dfs(node.func_type)
 		if p == "-p": print(node.id+ "()")
-		if p == "-s" : print("Function name :", node.id)
+		symbol_table.append(scope(function_name = node.id))
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 
 def Paramlist_dfs(node):
@@ -104,7 +130,7 @@ def Compoundstmt_dfs(node, function_name, beforecmpd):
 	function_name2 = function_name
 	if(beforecmpd):
 		fd = lookup_fname(function_name+" compound")
-		if p == "-s" : print("Function name :", function_name+ " compound(%d)"%(fd))
+		symbol_table.append(scope(function_name = function_name+ " compound(%d)"%(fd)))
 		function_name2 = function_name+ " compound(%d)"%(fd)
 	if node.decllist is not None:
 		if p == "-p": print("{")
@@ -115,7 +141,7 @@ def Compoundstmt_dfs(node, function_name, beforecmpd):
 		if p == "-p": print("{")
 		Stmtlist_dfs(node.stmtlist, function_name2, True)
 		if p == "-p": print("}")
-	
+
 def Stmtlist_dfs(node, function_name, beforecmpd):
 	if node.stmt is not None and node.stmtlist is not None:
 		Stmt_dfs(node.stmt, function_name, beforecmpd)
@@ -185,7 +211,8 @@ def Retstmt_dfs(node):
 def Whilestmt_dfs(node, function_name):
 	function_name = function_name + " while"
 	fd = lookup_fname(function_name)
-	if p == "-s" : print("Function name :", function_name+"(%d)"%(fd))
+	symbol_table.append(scope(function_name = function_name+ "(%d)"%(fd)))
+	
 	if node.isDowhile is True:
 		if p == "-p": print("do ", end ="")
 		Stmt_dfs(node.stmt, function_name+"(%d)"%(fd), False)
@@ -208,7 +235,8 @@ def Forstmt_dfs(node, function_name):
 	if p == "-p": print(")")
 	function_name = function_name + " for"
 	fd = lookup_fname(function_name)
-	if p == "-s" : print("Function name :", function_name+"(%d)"%(fd))
+	symbol_table.append(scope(function_name = function_name+ "(%d)"%(fd)))
+
 	Stmt_dfs(node.stmt, function_name+"(%d)"%(fd), False)
 
 def Ifstmt_dfs(node, function_name):
@@ -217,12 +245,14 @@ def Ifstmt_dfs(node, function_name):
 	if p == "-p": print(")")
 	function_name2 = function_name+ " if"
 	fd = lookup_fname(function_name2)
-	if p == "-s" : print("Function name :", function_name2+"(%d)"%(fd))
+	symbol_table.append(scope(function_name = function_name2+ "(%d)"%(fd)))
+
 	Stmt_dfs(node.ifstmt, function_name2+"(%d)"%(fd), False)
 	if node.elsestmt is not None:
 		function_name3 = function_name+ " else"
 		fd = lookup_fname(function_name3)
-		if p == "-s" : print("Function name :", function_name3+"(%d)"%(fd))
+		symbol_table.append(scope(function_name = function_name3+ "(%d)"%(fd)))
+
 		Stmt_dfs(node.elsestmt, function_name3+"(%d)"%(fd), False)
 
 def Switchstmt_dfs(node, function_name):
@@ -243,7 +273,7 @@ def Casestmt_dfs(node, function_name):
 	if p == "-p": print("case ", node.intnum, ":", end =" ")
 	function_name = function_name+" case"+ node.intnum
 	fd = lookup_fname(function_name)
-	if p == "-s" : print("Function name :", function_name+"(%d)"%(fd))
+	symbol_table.append(scope(function_name = function_name+ "(%d)"%(fd)))
 	Stmtlist_dfs(node.stmtlist, function_name+"(%d)"%(fd), True)
 	if node.isbreak:
 		if p == "-p": print("break;")
@@ -255,7 +285,7 @@ def Defaultstmt_dfs(node, function_name):
 	if p == "-p": print("default :", end ="")
 	function_name = function_name + " default"
 	fd = lookup_fname(function_name)
-	if p == "-s" : print("Function name :", function_name+"(%d)"%(fd))
+	symbol_table.append(scope(function_name = function_name+ "(%d)"%(fd)))
 	Stmtlist_dfs(node.stmtlist, function_name+"(%d)"%(fd),False)
 	if node.isbreak:
 		if p == "-p": print("break;")
@@ -283,9 +313,9 @@ def Expr_dfs(node):
 				if p == "-p": print(")", end="")
 		else:
 			Expr_dfs(node.id_expr)
-			if p == "-p": print("[", end ="") 
+			if p == "-p": print("[", end ="")
 			Expr_dfs(node.expr)
-			if p == "-p": print("]")
+			if p == "-p": print("]", end="")
 
 def Unop_dfs(node):
 	if p == "-p": print("-", end="")
@@ -304,3 +334,9 @@ def Arglist_dfs(node):
 		Arglist_dfs(node.arglist)
 		if p == "-p": print(",", end=" ")
 		Expr_dfs(node.expr)
+def print_st():
+	for s in symbol_table:
+		print(s.function_name)
+		for l in s.symbols:
+			print(l.type,"\t",l.id,"\t",l.array,"\t",l.role)
+		print()
