@@ -24,7 +24,9 @@ class scope:
 		self.function_name =function_name
 		self.isfunction = isfunction
 		self.function_type = function_type
+		self.paramNum = 0
 		self.symbols =[]
+		
 
 
 symbol_table = []
@@ -117,6 +119,7 @@ def Function_dfs(node):
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 
 def Paramlist_dfs(node):
+	symbol_table[-1].paramNum = symbol_table[-1].paramNum+1
 	if node.paramlist is not None:
 		Paramlist_dfs(node.paramlist)
 		if p == "-p": print(",", end = "")
@@ -200,13 +203,14 @@ def Callstmt_dfs(node):
 	if p == "-p": print(";")
 
 def Call_dfs(node):
-	lookup_call(node.id)	
 	if node.arglist is None:
+		lookup_call(node.id,0)	
 		if p == "-p": print(node.id+"()", end ="")
 		pass
 	else:
 		if p == "-p": print(node.id+ "(", end="")
-		Arglist_dfs(node.arglist)
+		argNum = Arglist_dfs(node.arglist, 0)
+		lookup_call(node.id, argNum)
 		if p == "-p": print(")", end="")
 
 def Retstmt_dfs(node):
@@ -337,13 +341,15 @@ def Binop_dfs(node):
 	if p == "-p": print(node.op, end =" ")
 	Expr_dfs(node.right)
 
-def Arglist_dfs(node):
+def Arglist_dfs(node, argNum):
+	argNum = argNum +1
 	if node.arglist is None:
 		Expr_dfs(node.expr)
 	else:
-		Arglist_dfs(node.arglist)
+		argNum = Arglist_dfs(node.arglist, argNum)
 		if p == "-p": print(",", end=" ")
 		Expr_dfs(node.expr)
+	return argNum
 
 def lookup_st(p, isRedecla):
 	try:
@@ -376,16 +382,23 @@ def lookup_st(p, isRedecla):
 					exit()
 			else:
 				return
-def lookup_call(p):
+def lookup_call(p, argNum):
 	for i in symbol_table:
 		if i.function_name == p:
-			return
-	sys.stderr.write('%s no function declaration\n'%(p))
+			if i.paramNum == argNum:
+				return
+			elif i.paramNum < argNum:
+				print("too many arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
+				exit()
+			else:
+				print("too few arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
+				exit()
+	print('%s no function declaration\n'%(p))
 	exit()
 
 def print_st():
 	for s in symbol_table:
-		print("function name : %s / function type : %s / is_function : %s"%(s.function_name, s.function_type, s.isfunction))
+		print("function name : %s / function type : %s / is_function : %s paramNum %d "%(s.function_name, s.function_type, s.isfunction, s.paramNum))
 		for l in s.symbols:
 			print(l.type,"\t",l.id,"\t",l.array,"\t",l.role)
 		print()
