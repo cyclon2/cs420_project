@@ -198,6 +198,7 @@ def Callstmt_dfs(node):
 	if p == "-p": print(";")
 
 def Call_dfs(node):
+	lookup_call(node.id)	
 	if node.arglist is None:
 		if p == "-p": print(node.id+"()", end ="")
 		pass
@@ -352,6 +353,12 @@ def lookup_st(p):
 				return
 		else:
 			sys.stderr.write('%s no declaration\n'%(p))
+def lookup_call(p):
+	for i in symbol_table:
+		if i.function_name == p:
+			return
+	sys.stderr.write('%s no function declaration\n'%(p))
+
 def print_st():
 	for s in symbol_table:
 		print(s.function_name, s.function_type)
