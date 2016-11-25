@@ -1,15 +1,21 @@
 int var1, var2;
 float var3[10];
 
+float print(int a, int b, int c){
+	return a;	
+}
+
 int f(int in)
 {
 	int a;
 	a = a +1;
 	switch(a){
 		case 1 : {
+			int b, i;
+			int c[2];
 			b = b + 1;
-			c = c[0]+ 1;
-			print(a,b,c);
+			a = c[0]+ 1;
+			print(a,b,c[1]);
 			for(i=0; i<10; i = i+1){
 				int tt;
 				{

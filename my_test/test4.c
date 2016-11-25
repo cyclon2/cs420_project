@@ -1,4 +1,9 @@
-
+int avg(float a, float b){
+	return a;	
+}
+int printf(float a, float b){
+	return a;	
+}
 int main(){
 	int studentNumber, count, i, sum;
 	int mark[4];
@@ -11,7 +16,9 @@ int main(){
 		sum = sum + mark[i];
 		average = avg(i+1, mark);
 		if (average > 40.0 ) { 
+			int tim;
 			printf(tim, average);
+
 		}
 	}
 }

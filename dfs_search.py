@@ -216,11 +216,16 @@ def Call_dfs(node):
 
 def Retstmt_dfs(node):
 	if node.expr is None:
+		if symbol_table[-1].function_type != None:
+			print("non-void function '%s' should return a value"%(symbol_table[-1].function_name))
+			exit()
 		if p == "-p": print("return;")
 		pass
 	else:
 		if p == "-p": print("return", end =" ")
-		Expr_dfs(node.expr)
+		ret = Expr_dfs(node.expr)
+		if ret != "id" and symbol_table[-1].function_type != ret:
+			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[-1].function_type, ret))
 		if p == "-p": print(";")
 
 def Whilestmt_dfs(node, function_name):
@@ -311,9 +316,9 @@ def Defaultstmt_dfs(node, function_name):
 def Expr_dfs(node, isArray = False):
 	if type(node) == str:
 		if p == "-p": print(node, end =" ")
-		lookup_st(node, False, isArray)
+		return lookup_st(node, False, isArray)
 	elif type(node.expr) == str:
-		Expr_dfs(node.expr)
+		 return Expr_dfs(node.expr)
 	else:
 		if node.id_expr is None:
 			if node.expr.type == "unop":
@@ -331,6 +336,7 @@ def Expr_dfs(node, isArray = False):
 			if p == "-p": print("[", end ="")
 			Expr_dfs(node.expr)
 			if p == "-p": print("]", end="")
+
 
 def Unop_dfs(node):
 	if p == "-p": print("-", end="")
@@ -362,9 +368,11 @@ def lookup_funcName(s):
 def lookup_st(p, isRedecla, isArray):
 	try:
 		try:
-			float(p)
-		except:
 			int(p)
+			return "int"
+		except:
+			float(p)
+			return "float"
 	except:
 		if isRedecla == False:
 			func_scope = symbol_table[-1]
@@ -373,9 +381,9 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
-							return
+							return "id"
 						elif isArray == False and i.array == None:
-							return
+							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
@@ -386,9 +394,9 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
-							return
+							return "id"
 						elif isArray == False and i.array == None:
-							return
+							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
@@ -401,7 +409,9 @@ def lookup_st(p, isRedecla, isArray):
 					print('redefinitio of %s n\n'%(p))
 					exit()
 			else:
-				return
+				return "id"
+
+
 def lookup_call(p, argNum):
 	for i in symbol_table:
 		if i.function_name == p:
