@@ -352,6 +352,13 @@ def Arglist_dfs(node, argNum):
 		Expr_dfs(node.expr)
 	return argNum
 
+
+def lookup_funcName(s):
+	super_funcName = s.rsplit(" ",1)[0]
+	for scope in symbol_table:
+		if scope.function_name == super_funcName:
+			return scope
+
 def lookup_st(p, isRedecla, isArray):
 	try:
 		try:
@@ -360,9 +367,9 @@ def lookup_st(p, isRedecla, isArray):
 			int(p)
 	except:
 		if isRedecla == False:
-			idx = -1
-			while(symbol_table[idx].isfunction == False):
-				l = symbol_table[idx].symbols
+			func_scope = symbol_table[-1]
+			while(func_scope.isfunction == False):
+				l = func_scope.symbols
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
@@ -372,10 +379,10 @@ def lookup_st(p, isRedecla, isArray):
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
-				idx = idx-1
+				func_scope = lookup_funcName(func_scope.function_name)
 
-			if symbol_table[idx].isfunction == True:
-				l = symbol_table[idx].symbols
+			if func_scope.isfunction == True:
+				l = func_scope.symbols
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
@@ -385,7 +392,7 @@ def lookup_st(p, isRedecla, isArray):
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
-				print('%s %s no declaration\n'%(p ,symbol_table[idx].function_name))
+				print('%s %s no declaration\n'%(p ,func_scope.function_name))
 				exit()
 		else:
 			l = symbol_table[-1].symbols
@@ -411,7 +418,7 @@ def lookup_call(p, argNum):
 
 def print_st():
 	for s in symbol_table:
-		print("function name : %s / function type : %s / is_function : %s paramNum %d "%(s.function_name, s.function_type, s.isfunction, s.paramNum))
+		print("func name : %s // func type : %s // is_func : %s // paramNum %d "%(s.function_name, s.function_type, s.isfunction, s.paramNum))
 		for l in s.symbols:
 			print(l.type,"\t",l.id,"\t",l.array,"\t",l.role)
 		print()
