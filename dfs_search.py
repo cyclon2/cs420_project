@@ -1,3 +1,4 @@
+import sys
 name_table = {}
 
 ## function name and frequnecy
@@ -16,10 +17,15 @@ class symbol:
 		self.type = type
 		self.array = None
 		self.role = role
+
+
 class scope:
-	def __init__(self, function_name="global", symbols=[]):
+	def __init__(self, function_name="global", symbols=[], function_type = ""):
 		self.function_name =function_name
+		self.function_type = function_type
 		self.symbols =[]
+
+
 symbol_table = []
 
 def Program_dfs(node, pw):
@@ -72,13 +78,13 @@ def Identlist_dfs(node, dec_type):
 
 def identifier_dfs(node, dec_type, isparam):
 	if dec_type != None:
-		symbol_table[-1].symbols.append(symbol(type =dec_type ))
+		symbol_table[-1].symbols.append(symbol(type =dec_type))
 		if node.intnum is not None:
 			if isparam :
 				symbol_table[-1].symbols[-1].id = node.id
 				symbol_table[-1].symbols[-1].array = node.intnum
 				symbol_table[-1].symbols[-1].role = "parameter"
-			else : 
+			else :
 				symbol_table[-1].symbols[-1].id = node.id
 				symbol_table[-1].symbols[-1].array = node.intnum
 				symbol_table[-1].symbols[-1].role = "variable"
@@ -87,24 +93,25 @@ def identifier_dfs(node, dec_type, isparam):
 			if isparam:
 				symbol_table[-1].symbols[-1].id = node.id
 				symbol_table[-1].symbols[-1].role = "parameter"
-			else : 
+			else :
 				symbol_table[-1].symbols[-1].id = node.id
 				symbol_table[-1].symbols[-1].role = "variable"
 
 			if p == "-p": print(node.id, end = "")
 
 def Function_dfs(node):
+	dec_type = Type_dfs(node.func_type)
 	if node.paramlist is not None:
-		Type_dfs(node.func_type)
 		if p == "-p": print(node.id+ "(", end="")
 		symbol_table.append(scope(function_name = node.id))
+		symbol_table[-1].function_type = dec_type
 		Paramlist_dfs(node.paramlist)
 		if p == "-p": print(")", end="")
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 	else:
-		Type_dfs(node.func_type)
 		if p == "-p": print(node.id+ "()")
 		symbol_table.append(scope(function_name = node.id))
+		symbol_table[-1].function_type = dec_type
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 
 def Paramlist_dfs(node):
@@ -212,7 +219,7 @@ def Whilestmt_dfs(node, function_name):
 	function_name = function_name + " while"
 	fd = lookup_fname(function_name)
 	symbol_table.append(scope(function_name = function_name+ "(%d)"%(fd)))
-	
+
 	if node.isDowhile is True:
 		if p == "-p": print("do ", end ="")
 		Stmt_dfs(node.stmt, function_name+"(%d)"%(fd), False)
@@ -296,7 +303,7 @@ def Defaultstmt_dfs(node, function_name):
 def Expr_dfs(node):
 	if type(node) == str:
 		if p == "-p": print(node, end =" ")
-		pass
+		lookup_st(node)
 	elif type(node.expr) == str:
 		Expr_dfs(node.expr)
 	else:
@@ -334,9 +341,20 @@ def Arglist_dfs(node):
 		Arglist_dfs(node.arglist)
 		if p == "-p": print(",", end=" ")
 		Expr_dfs(node.expr)
+
+def lookup_st(p):
+	try:
+		int(p)
+	except:
+		l = symbol_table[-1].symbols
+		for i in l:
+			if p == i.id:
+				return
+		else:
+			sys.stderr.write('%s no declaration\n'%(p))
 def print_st():
 	for s in symbol_table:
-		print(s.function_name)
+		print(s.function_name, s.function_type)
 		for l in s.symbols:
 			print(l.type,"\t",l.id,"\t",l.array,"\t",l.role)
 		print()
