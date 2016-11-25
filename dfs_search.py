@@ -15,7 +15,7 @@ class symbol:
 	def __init__(self,id="", type="", array=None, role=""):
 		self.id = id
 		self.type = type
-		self.array = None
+		self.array = array
 		self.role = role
 
 
@@ -81,7 +81,7 @@ def Identlist_dfs(node, dec_type):
 
 def identifier_dfs(node, dec_type, isparam):
 	if dec_type != None:
-		lookup_st(node.id, True)
+		lookup_st(node.id, True, False)
 		symbol_table[-1].symbols.append(symbol(type =dec_type))
 		if node.intnum is not None:
 			if isparam :
@@ -190,9 +190,10 @@ def Assignstmt_dfs(node):
 
 def Assign_dfs(node):
 	if node.expr2 is None:
+		lookup_st(node.id,False, False)
 		if p == "-p": print(node.id+ "=", end = " ")
 		Expr_dfs(node.expr1)
-	else:
+	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
 		Expr_dfs(node.expr1)
 		if p == "-p": print("]=", end = " ")
@@ -307,10 +308,10 @@ def Defaultstmt_dfs(node, function_name):
 	else:
 		pass
 
-def Expr_dfs(node):
+def Expr_dfs(node, isArray = False):
 	if type(node) == str:
 		if p == "-p": print(node, end =" ")
-		lookup_st(node, False)
+		lookup_st(node, False, isArray)
 	elif type(node.expr) == str:
 		Expr_dfs(node.expr)
 	else:
@@ -326,7 +327,7 @@ def Expr_dfs(node):
 				Expr_dfs(node.expr)
 				if p == "-p": print(")", end="")
 		else:
-			Expr_dfs(node.id_expr)
+			Expr_dfs(node.id_expr, True)
 			if p == "-p": print("[", end ="")
 			Expr_dfs(node.expr)
 			if p == "-p": print("]", end="")
@@ -351,7 +352,7 @@ def Arglist_dfs(node, argNum):
 		Expr_dfs(node.expr)
 	return argNum
 
-def lookup_st(p, isRedecla):
+def lookup_st(p, isRedecla, isArray):
 	try:
 		try:
 			float(p)
@@ -364,21 +365,33 @@ def lookup_st(p, isRedecla):
 				l = symbol_table[idx].symbols
 				for i in l:
 					if p == i.id:
-						return
+						if isArray ==True and i.array !=None:
+							return
+						elif isArray == False and i.array == None:
+							return
+						else:
+							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							exit()
 				idx = idx-1
 
 			if symbol_table[idx].isfunction == True:
 				l = symbol_table[idx].symbols
 				for i in l:
 					if p == i.id:
-						return
+						if isArray ==True and i.array !=None:
+							return
+						elif isArray == False and i.array == None:
+							return
+						else:
+							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							exit()
 				print('%s %s no declaration\n'%(p ,symbol_table[idx].function_name))
 				exit()
 		else:
 			l = symbol_table[-1].symbols
 			for i in l:
 				if p == i.id:
-					print('%s redeclaration\n'%(p))
+					print('redefinitio of %s n\n'%(p))
 					exit()
 			else:
 				return
