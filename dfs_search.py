@@ -191,14 +191,18 @@ def Assignstmt_dfs(node):
 def Assign_dfs(node):
 	if node.expr2 is None:
 		if p == "-p": print(node.id+ "=", end = " ")
-		id_type = lookup_st(node.id,False, False)
+		id_type = lookup_st(node.id,False, False).type
 		ret = Expr_dfs(node.expr1)
 		if(id_type == "int" and ret == "FLOATNUM"):
 			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
-		id_type = lookup_st(node.id,False, True)
-		Expr_dfs(node.expr1)
+		sym = lookup_st(node.id,False, True)
+		id_type = sym.type
+		id_num = sym.array
+		idx_num = Expr_dfs(node.expr1,True)
+		if idx_num > int(sym.array):
+			print("warning: array index %d is past the end of the array"%(idx_num))
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
 		if(id_type == "int" and ret == "FLOATNUM"):
@@ -326,7 +330,7 @@ def Expr_dfs(node, isArray = False):
 		if p == "-p": print(node, end =" ")
 		return lookup_st(node, False, isArray)
 	elif type(node.expr) == str:
-		 return Expr_dfs(node.expr)
+		 return Expr_dfs(node.expr, isArray)
 	else:
 		if node.id_expr is None:
 			if node.expr.type == "unop":
@@ -377,6 +381,8 @@ def lookup_st(p, isRedecla, isArray):
 	try:
 		try:
 			int(p)
+			if isArray:
+				return int(p)
 			return "INTNUM"
 		except:
 			float(p)
@@ -388,18 +394,8 @@ def lookup_st(p, isRedecla, isArray):
 				l = func_scope.symbols
 				for i in l:
 					if p == i.id:
-						if isArray ==True and i.array !=None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
-						elif isArray == False and i.array == None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
+						if (isArray ==True and i.array !=None) or (isArray == False and i.array == None):
+							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
@@ -409,18 +405,8 @@ def lookup_st(p, isRedecla, isArray):
 				l = func_scope.symbols
 				for i in l:
 					if p == i.id:
-						if isArray ==True and i.array !=None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
-						elif isArray == False and i.array == None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
+						if (isArray ==True and i.array !=None) or (isArray == False and i.array == None):
+							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()	
@@ -429,18 +415,8 @@ def lookup_st(p, isRedecla, isArray):
 				l = func_scope.symbols
 				for i in l:
 					if p == i.id:
-						if isArray==True and i.array !=None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
-						elif isArray == False and i.array == None:
-							if i.type == "int":
-								return "int"
-							elif i.type == "float":
-								return "float"
-							return "id"
+						if (isArray==True and i.array !=None) or (isArray == False and i.array == None):
+							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
