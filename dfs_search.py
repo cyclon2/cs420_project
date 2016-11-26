@@ -104,10 +104,25 @@ def identifier_dfs(node, dec_type, isparam):
 
 			if p == "-p": print(node.id, end = "")
 	else:
-		for i in symbol_table:
-			for sym in i.symbols:
+		lookup_st(node.id, False, False)
+		scope = symbol_table[-1]
+		while scope.isfunction == False:
+			for sym in scope.symbols:
 				if sym.id == node.id:
 					sym.isused= True
+					return
+			scope = lookup_funcName(scope.function_name)
+		if scope.isfunction == True:
+			for sym in scope.symbols:
+				if sym.id == node.id:
+					symisused = True
+					return
+		if symbol_table[0].function_name =="0global":
+			for sym in symbol_table[0].symbols:
+				if sym.id == node.id:
+					sym.isused = True
+					return
+
 
 def Function_dfs(node):
 	dec_type = Type_dfs(node.func_type)
@@ -346,15 +361,15 @@ def Defaultstmt_dfs(node, function_name):
 def Expr_dfs(node, isArray = False, isNegative = False):
 	if type(node) == str:
 		if p == "-p": print(node, end =" ")
-		if isNegative and type(lookup_st(node, False, isNegative))== int:
-			return lookup_st(node, False, isNegative) * (-1)
+		if isNegative and type(lookup_st(node, False,isArray))== int:
+			return lookup_st(node, False,isArray) * (-1)
 		else:
-			return lookup_st(node, False, isNegative)
+			return lookup_st(node, False,isArray)
 	elif type(node.expr) == str:
-		if isNegative and type(Expr_dfs(node.expr, isNegative)) ==int:
-			return Expr_dfs(node.expr, isNegative) *(-1)
+		if isNegative and type(Expr_dfs(node.expr, isArray,isNegative)) ==int:
+			return Expr_dfs(node.expr,isArray, isNegative) *(-1)
 		else:
-			return Expr_dfs(node.expr, isNegative)
+			return Expr_dfs(node.expr,isArray, isNegative)
 	else:
 		if node.id_expr is None:
 			if node.expr.type == "unop":
