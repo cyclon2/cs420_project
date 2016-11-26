@@ -105,23 +105,6 @@ def identifier_dfs(node, dec_type, isparam):
 			if p == "-p": print(node.id, end = "")
 	else:
 		lookup_st(node.id, False, False)
-		scope = symbol_table[-1]
-		while scope.isfunction == False:
-			for sym in scope.symbols:
-				if sym.id == node.id:
-					sym.isused= True
-					return
-			scope = lookup_funcName(scope.function_name)
-		if scope.isfunction == True:
-			for sym in scope.symbols:
-				if sym.id == node.id:
-					symisused = True
-					return
-		if symbol_table[0].function_name =="0global":
-			for sym in symbol_table[0].symbols:
-				if sym.id == node.id:
-					sym.isused = True
-					return
 
 
 def Function_dfs(node):
@@ -220,10 +203,11 @@ def Assignstmt_dfs(node):
 def Assign_dfs(node):
 	if node.expr2 is None:
 		if p == "-p": print(node.id+ "=", end = " ")
-		id_type = lookup_st(node.id,False, False).type
+		sym = lookup_st(node.id,False, False)
+		id_type = sym.type
 		ret = Expr_dfs(node.expr1)
 		if(id_type =="int" and ret == "FLOATNUM"):
-			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
+			print("warning: implicit conversion from '%s' to '%s' changes value in '%s'"%("int", "float", sym.id))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
 		sym = lookup_st(node.id,False, True)
@@ -239,7 +223,7 @@ def Assign_dfs(node):
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
 		if(id_type == "int" and ret == "FLOATNUM"):
-			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
+			print("warning: implicit conversion from '%s' to '%s' changes value in '%s'"%("int", "float", sym.id))
 
 def Callstmt_dfs(node):
 	Call_dfs(node.call)
@@ -270,7 +254,7 @@ def Retstmt_dfs(node):
 		if p == "-p": print("return", end =" ")
 		ret = Expr_dfs(node.expr)
 		if(ret =="FLOATNUM" and  symbol_table[idx].function_type == "int"):
-			print("warning: implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, "float"))
+			print("warning: implicit conversion from '%s' to '%s' changes value in function '%s'"%(symbol_table[idx].function_type, "float", symbol_table[idx].function_name))
 		if p == "-p": print(";")
 
 def Whilestmt_dfs(node, function_name):
@@ -435,7 +419,7 @@ def lookup_st(p, isRedecla, isArray=False):
 							i.isused = True
 							return i
 						else:
-							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: '%s' subscripted value is not an array, pointer, or vector"%(p))
 							exit()
 				func_scope = lookup_funcName(func_scope.function_name)
 
@@ -447,7 +431,7 @@ def lookup_st(p, isRedecla, isArray=False):
 							i.isused = True
 							return i
 						else:
-							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: '%s' subscripted value is not an array, pointer, or vector"%(p))
 							exit()	
 			if symbol_table[0].function_name == "0global":
 				func_scope = symbol_table[0]
@@ -458,16 +442,16 @@ def lookup_st(p, isRedecla, isArray=False):
 							i.isused = True
 							return i
 						else:
-							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: '%s' subscripted value is not an array, pointer, or vector"%(p))
 							exit()
 
-			print('error: %s no declaration in any scope\n'%(p))
+			print("error: '%s' no declaration in any scope\n"%(p))
 			exit()
 		else:
 			l = symbol_table[-1].symbols
 			for i in l:
 				if p == i.id:
-					print('error: redefinitio of %s n\n'%(p))
+					print("error: redefinitio of '%s' n\n"%(p))
 					exit()
 			else:
 				return "id"
@@ -484,13 +468,13 @@ def lookup_call(p, argNum):
 			else:
 				print("error: too few arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
 				exit()
-	print('error: %s no function declaration\n'%(p))
+	print("error: '%s' no function declaration"%(p))
 	exit()
 def print_unused():
 	for s in symbol_table:
 		for sym in s.symbols:
 			if sym.isused == False:
-				print("warning: %s expression result unused"%(sym.id))
+				print("warning: '%s' expression result unused in function '%s'"%(sym.id, s.function_name))
 
 def print_st():
 	for s in symbol_table:
