@@ -247,7 +247,7 @@ def Assign_dfs(node):
 			
 	else:	
 		#if p == "-p": print(node.id+ "[", end = " ")
-		print_ast += node.id+"[ "
+		print_ast += node.id+"["
 		sym = lookup_st(node.id,False, True)
 		id_type = sym.type
 		id_num = sym.array
@@ -427,7 +427,7 @@ def Expr_dfs(node, isArray = False, isNegative = False, assign = None, ret = Non
 				print("warning: implicit conversion from '%s' to '%s' changes value in '%s'"%("int", "float", ret.function_name))
 				node = node.split(".")[0]	
 		#if p == "-p": print(node, end =" ")
-		print_ast += node+" "
+		print_ast += node
 		#check_type = type(lookup_st(node, False,isArray))
 		return lookup_st(node, False,isArray)
 	elif type(node.expr) == str:
@@ -542,7 +542,7 @@ def lookup_st(p, isRedecla, isArray=False):
 			l = symbol_table[-1].symbols
 			for i in l:
 				if p == i.id:
-					print("error: redefinitio of '%s' n\n"%(p))
+					print("error: redefinitio of '%s' \n"%(p))
 					exit()
 			else:
 				return "id"
