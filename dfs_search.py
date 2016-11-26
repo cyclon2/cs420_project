@@ -193,7 +193,7 @@ def Assign_dfs(node):
 		id_type = lookup_st(node.id,False, False)
 		if p == "-p": print(node.id+ "=", end = " ")
 		ret = Expr_dfs(node.expr1)
-		if ret != id_type and id_type != "id":
+		if ret != id_type and id_type != "id" and ret != None:
 			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
@@ -201,7 +201,7 @@ def Assign_dfs(node):
 		Expr_dfs(node.expr1)
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
-		if ret != id_type and id_type !="id":
+		if ret != id_type and id_type !="id" and ret != None:
 			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 
 def Callstmt_dfs(node):
@@ -386,8 +386,16 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						elif isArray == False and i.array == None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
@@ -399,8 +407,16 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if isArray ==True and i.array !=None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						elif isArray == False and i.array == None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
@@ -411,8 +427,16 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if isArray==True and i.array !=None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						elif isArray == False and i.array == None:
+							if i.type == "int":
+								return "int"
+							elif i.type == "float":
+								return "float"
 							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
