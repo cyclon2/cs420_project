@@ -112,8 +112,8 @@ def Function_dfs(node):
 	if node.paramlist is not None:
 		if p == "-p": print(node.id+ "(", end="")
 		for func in symbol_table:
-			if func == node.id:
-				print("error: redefinition of '%s'"%(func))
+			if func.function_name == node.id:
+				print("error: redefinition of '%s'"%(node.id))
 				exit()
 		symbol_table.append(scope(function_name = node.id, isfunction = True))
 		symbol_table[-1].function_type = dec_type
@@ -123,8 +123,8 @@ def Function_dfs(node):
 	else:
 		if p == "-p": print(node.id+ "()")
 		for func in symbol_table:
-			if func == node.id:
-				print("error: redefinition of '%s'"%(func))
+			if func.function_name == node.id:
+				print("error: redefinition of '%s'"%(node.id))
 				exit()
 		symbol_table.append(scope(function_name = node.id, isfunction = True))
 		symbol_table[-1].function_type = dec_type
