@@ -103,11 +103,20 @@ def identifier_dfs(node, dec_type, isparam):
 				symbol_table[-1].symbols[-1].role = "variable"
 
 			if p == "-p": print(node.id, end = "")
+	else:
+		for i in symbol_table:
+			for sym in i.symbols:
+				if sym.id == node.id:
+					sym.isused= True
 
 def Function_dfs(node):
 	dec_type = Type_dfs(node.func_type)
 	if node.paramlist is not None:
 		if p == "-p": print(node.id+ "(", end="")
+		for func in symbol_table:
+			if func == node.id:
+				print("error: redefinition of '%s'"%(func))
+				exit()
 		symbol_table.append(scope(function_name = node.id, isfunction = True))
 		symbol_table[-1].function_type = dec_type
 		Paramlist_dfs(node.paramlist)
@@ -115,6 +124,10 @@ def Function_dfs(node):
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
 	else:
 		if p == "-p": print(node.id+ "()")
+		for func in symbol_table:
+			if func == node.id:
+				print("error: redefinition of '%s'"%(func))
+				exit()
 		symbol_table.append(scope(function_name = node.id, isfunction = True))
 		symbol_table[-1].function_type = dec_type
 		Compoundstmt_dfs(node.compoundstmt, node.id, False)
@@ -194,18 +207,20 @@ def Assign_dfs(node):
 		if p == "-p": print(node.id+ "=", end = " ")
 		id_type = lookup_st(node.id,False, False).type
 		ret = Expr_dfs(node.expr1)
-		if(id_type == "int" and ret == "FLOATNUM"):
+		if(id_type =="int" and ret == "FLOATNUM"):
 			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
 		sym = lookup_st(node.id,False, True)
 		id_type = sym.type
 		id_num = sym.array
-		idx_num = Expr_dfs(node.expr1,True)
-		if type(idx_num) == str:
-			print("warning: array index is before the beginning of the array")
+		idx_num = Expr_dfs(node.expr1)
+		if type(idx_num) == symbol:
+			pass
 		elif idx_num > int(sym.array):
-			print("warning: array index %d is past the end of the array"%(idx_num))
+			print("warning: array index %d is past the end of the array"%(idx_num))	
+		elif type(idx_num) == int and idx_num < 0:
+			print("warning: array index %d is before the beginning of the array"%(idx_num))
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
 		if(id_type == "int" and ret == "FLOATNUM"):
@@ -240,7 +255,7 @@ def Retstmt_dfs(node):
 		if p == "-p": print("return", end =" ")
 		ret = Expr_dfs(node.expr)
 		if(ret =="FLOATNUM" and  symbol_table[idx].function_type == "int"):
-			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, "float"))
+			print("warning: implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, "float"))
 		if p == "-p": print(";")
 
 def Whilestmt_dfs(node, function_name):
@@ -328,16 +343,22 @@ def Defaultstmt_dfs(node, function_name):
 	else:
 		pass
 
-def Expr_dfs(node, isArray = False):
+def Expr_dfs(node, isArray = False, isNegative = False):
 	if type(node) == str:
 		if p == "-p": print(node, end =" ")
-		return lookup_st(node, False, isArray)
+		if isNegative and type(lookup_st(node, False, isNegative))== int:
+			return lookup_st(node, False, isNegative) * (-1)
+		else:
+			return lookup_st(node, False, isNegative)
 	elif type(node.expr) == str:
-		 return Expr_dfs(node.expr, isArray)
+		if isNegative and type(Expr_dfs(node.expr, isNegative)) ==int:
+			return Expr_dfs(node.expr, isNegative) *(-1)
+		else:
+			return Expr_dfs(node.expr, isNegative)
 	else:
 		if node.id_expr is None:
 			if node.expr.type == "unop":
-				return Unop_dfs(node.expr)
+				return Unop_dfs(node.expr, True)
 			elif node.expr.type == "bioperaion":
 				Binop_dfs(node.expr)
 			elif node.expr.type == "call":
@@ -353,9 +374,9 @@ def Expr_dfs(node, isArray = False):
 			if p == "-p": print("]", end="")
 
 
-def Unop_dfs(node):
+def Unop_dfs(node, isNegative = True):
 	if p == "-p": print("-", end="")
-	return Expr_dfs(node.value)
+	return Expr_dfs(node.value, isNegative = True)
 	pass
 
 def Binop_dfs(node):
@@ -380,13 +401,11 @@ def lookup_funcName(s):
 		if scope.function_name == super_funcName:
 			return scope
 
-def lookup_st(p, isRedecla, isArray):
+def lookup_st(p, isRedecla, isArray=False):
 	try:
 		try:
 			int(p)
-			if isArray:
-				return int(p)
-			return "INTNUM"
+			return int(p)
 		except:
 			float(p)
 			return "FLOATNUM"
@@ -401,7 +420,7 @@ def lookup_st(p, isRedecla, isArray):
 							i.isused = True
 							return i
 						else:
-							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
 				func_scope = lookup_funcName(func_scope.function_name)
 
@@ -413,7 +432,7 @@ def lookup_st(p, isRedecla, isArray):
 							i.isused = True
 							return i
 						else:
-							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
 							exit()	
 			if symbol_table[0].function_name == "0global":
 				func_scope = symbol_table[0]
@@ -424,16 +443,16 @@ def lookup_st(p, isRedecla, isArray):
 							i.isused = True
 							return i
 						else:
-							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							print("error: %s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
 
-			print('%s no declaration in any scope\n'%(p))
+			print('error: %s no declaration in any scope\n'%(p))
 			exit()
 		else:
 			l = symbol_table[-1].symbols
 			for i in l:
 				if p == i.id:
-					print('redefinitio of %s n\n'%(p))
+					print('error: redefinitio of %s n\n'%(p))
 					exit()
 			else:
 				return "id"
@@ -445,18 +464,18 @@ def lookup_call(p, argNum):
 			if i.paramNum == argNum:
 				return
 			elif i.paramNum < argNum:
-				print("too many arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
+				print("error: too many arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
 				exit()
 			else:
-				print("too few arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
+				print("error: too few arguments to function call, expected %d, have %d"%(i.paramNum, argNum))
 				exit()
-	print('%s no function declaration\n'%(p))
+	print('error: %s no function declaration\n'%(p))
 	exit()
 def print_unused():
 	for s in symbol_table:
 		for sym in s.symbols:
 			if sym.isused == False:
-				print("%s warning: expression result unused"%(sym.id))
+				print("warning: %s expression result unused"%(sym.id))
 
 def print_st():
 	for s in symbol_table:
