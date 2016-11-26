@@ -220,17 +220,20 @@ def Call_dfs(node):
 		if p == "-p": print(")", end="")
 
 def Retstmt_dfs(node):
+	idx= -1
+	while(symbol_table[idx].isfunction == False):
+		idx = idx -1
 	if node.expr is None:
-		if symbol_table[-1].function_type != None:
-			print("non-void function '%s' should return a value"%(symbol_table[-1].function_name))
+		if symbol_table[idx].function_type != None:
+			print("non-void function '%s' should return a value"%(symbol_table[idx].function_name))
 			exit()
 		if p == "-p": print("return;")
 		pass
 	else:
 		if p == "-p": print("return", end =" ")
 		ret = Expr_dfs(node.expr)
-		if ret != "id" and symbol_table[-1].function_type != ret:
-			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[-1].function_type, ret))
+		if ret != "id" and symbol_table[idx].function_type != ret and ret !=None:
+			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, ret))
 		if p == "-p": print(";")
 
 def Whilestmt_dfs(node, function_name):
