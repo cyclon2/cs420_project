@@ -80,7 +80,7 @@ def Identlist_dfs(node, dec_type):
 	else:
 		identifier_dfs(node.identifier, dec_type, False)
 
-def identifier_dfs(node, dec_type, isparam):
+def identifier_dfs(node, dec_type, isparam, isarray = False):
 	if dec_type != None:
 		lookup_st(node.id, True, False)
 		symbol_table[-1].symbols.append(symbol(type =dec_type))
@@ -104,7 +104,11 @@ def identifier_dfs(node, dec_type, isparam):
 
 			if p == "-p": print(node.id, end = "")
 	else:
-		lookup_st(node.id, False, False)
+		if isarray:
+			lookup_st(node.id, False, True)
+		else:
+			lookup_st(node.id, False, False)
+
 
 
 def Function_dfs(node):
@@ -306,7 +310,10 @@ def Ifstmt_dfs(node, function_name):
 
 def Switchstmt_dfs(node, function_name):
 	if p == "-p": print("swtich (", end ="")
-	identifier_dfs(node.identifier, None,False)
+	if node.identifier.intnum == None:
+		identifier_dfs(node.identifier, None,False)
+	else:
+		identifier_dfs(node.identifier, None,False, True)
 	if p == "-p": print("){", end="")
 	Caselist_dfs(node.caselist, function_name)
 	if p == "-p": print("}")
