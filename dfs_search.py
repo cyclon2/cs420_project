@@ -190,19 +190,19 @@ def Assignstmt_dfs(node):
 
 def Assign_dfs(node):
 	if node.expr2 is None:
-		id_type = lookup_st(node.id,False, False)
 		if p == "-p": print(node.id+ "=", end = " ")
+		id_type = lookup_st(node.id,False, False)
 		ret = Expr_dfs(node.expr1)
-		if ret != id_type and id_type != "id" and ret != None:
-			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
+		if(id_type == "int" and ret == "FLOATNUM"):
+			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
 		id_type = lookup_st(node.id,False, True)
 		Expr_dfs(node.expr1)
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
-		if ret != id_type and id_type !="id" and ret != None:
-			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
+		if(id_type == "int" and ret == "FLOATNUM"):
+			print("warning: implicit conversion from '%s' to '%s' changes value"%("int", "float"))
 
 def Callstmt_dfs(node):
 	Call_dfs(node.call)
@@ -232,8 +232,8 @@ def Retstmt_dfs(node):
 	else:
 		if p == "-p": print("return", end =" ")
 		ret = Expr_dfs(node.expr)
-		if ret != "id" and symbol_table[idx].function_type != ret and ret !=None:
-			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, ret))
+		if(ret =="FLOATNUM" and  symbol_table[idx].function_type == "int"):
+			print("warning implicit conversion from '%s' to '%s' changes value"%(symbol_table[idx].function_type, "float"))
 		if p == "-p": print(";")
 
 def Whilestmt_dfs(node, function_name):
@@ -377,10 +377,10 @@ def lookup_st(p, isRedecla, isArray):
 	try:
 		try:
 			int(p)
-			return "int"
+			return "INTNUM"
 		except:
 			float(p)
-			return "float"
+			return "FLOATNUM"
 	except:
 		if isRedecla == False:
 			func_scope = symbol_table[-1]
