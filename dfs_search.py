@@ -190,14 +190,19 @@ def Assignstmt_dfs(node):
 
 def Assign_dfs(node):
 	if node.expr2 is None:
-		lookup_st(node.id,False, False)
+		id_type = lookup_st(node.id,False, False)
 		if p == "-p": print(node.id+ "=", end = " ")
-		Expr_dfs(node.expr1)
+		ret = Expr_dfs(node.expr1)
+		if ret != id_type:
+			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
+		id_type = lookup_st(node.id,False, True)
 		Expr_dfs(node.expr1)
 		if p == "-p": print("]=", end = " ")
-		Expr_dfs(node.expr2)
+		ret = Expr_dfs(node.expr2)
+		if ret != id_type:
+			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 
 def Callstmt_dfs(node):
 	Call_dfs(node.call)
@@ -322,7 +327,7 @@ def Expr_dfs(node, isArray = False):
 	else:
 		if node.id_expr is None:
 			if node.expr.type == "unop":
-				Unop_dfs(node.expr)
+				return Unop_dfs(node.expr)
 			elif node.expr.type == "bioperaion":
 				Binop_dfs(node.expr)
 			elif node.expr.type == "call":
@@ -340,7 +345,7 @@ def Expr_dfs(node, isArray = False):
 
 def Unop_dfs(node):
 	if p == "-p": print("-", end="")
-	Expr_dfs(node.value)
+	return Expr_dfs(node.value)
 	pass
 
 def Binop_dfs(node):
@@ -413,7 +418,7 @@ def lookup_st(p, isRedecla, isArray):
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
 
-			print('%s %s no declaration\n'%(p ,func_scope.function_name))
+			print('%s no declaration in any scope\n'%(p))
 			exit()
 		else:
 			l = symbol_table[-1].symbols
