@@ -20,7 +20,7 @@ class symbol:
 
 
 class scope:
-	def __init__(self, function_name="global", symbols=[], function_type = "", isfunction = False):
+	def __init__(self, function_name="0global", symbols=[], function_type = "", isfunction = False):
 		self.function_name =function_name
 		self.isfunction = isfunction
 		self.function_type = function_type
@@ -399,9 +399,22 @@ def lookup_st(p, isRedecla, isArray):
 							return "id"
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
+							exit()	
+			if symbol_table[0].function_name == "0global":
+				func_scope = symbol_table[0]
+				l = func_scope.symbols
+				for i in l:
+					if p == i.id:
+						if isArray==True and i.array !=None:
+							return "id"
+						elif isArray == False and i.array == None:
+							return "id"
+						else:
+							print("%s subscripted value is not an array, pointer, or vector"%(p))
 							exit()
-				print('%s %s no declaration\n'%(p ,func_scope.function_name))
-				exit()
+
+			print('%s %s no declaration\n'%(p ,func_scope.function_name))
+			exit()
 		else:
 			l = symbol_table[-1].symbols
 			for i in l:
