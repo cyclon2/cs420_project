@@ -17,6 +17,7 @@ class symbol:
 		self.type = type
 		self.array = array
 		self.role = role
+		self.isused = False
 
 
 class scope:
@@ -47,7 +48,7 @@ def Program_dfs(node, pw):
 			Funclist_dfs(node.first_list)
 	else:
 		pass
-
+	print_unused()
 
 def Decllist_dfs(node):
 	if node.decllist is not None:
@@ -201,7 +202,9 @@ def Assign_dfs(node):
 		id_type = sym.type
 		id_num = sym.array
 		idx_num = Expr_dfs(node.expr1,True)
-		if idx_num > int(sym.array):
+		if type(idx_num) == str:
+			print("warning: array index is before the beginning of the array")
+		elif idx_num > int(sym.array):
 			print("warning: array index %d is past the end of the array"%(idx_num))
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
@@ -395,6 +398,7 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if (isArray ==True and i.array !=None) or (isArray == False and i.array == None):
+							i.isused = True
 							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
@@ -406,6 +410,7 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if (isArray ==True and i.array !=None) or (isArray == False and i.array == None):
+							i.isused = True
 							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
@@ -416,6 +421,7 @@ def lookup_st(p, isRedecla, isArray):
 				for i in l:
 					if p == i.id:
 						if (isArray==True and i.array !=None) or (isArray == False and i.array == None):
+							i.isused = True
 							return i
 						else:
 							print("%s subscripted value is not an array, pointer, or vector"%(p))
@@ -446,6 +452,11 @@ def lookup_call(p, argNum):
 				exit()
 	print('%s no function declaration\n'%(p))
 	exit()
+def print_unused():
+	for s in symbol_table:
+		for sym in s.symbols:
+			if sym.isused == False:
+				print("%s warning: expression result unused"%(sym.id))
 
 def print_st():
 	for s in symbol_table:
