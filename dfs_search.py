@@ -193,7 +193,7 @@ def Assign_dfs(node):
 		id_type = lookup_st(node.id,False, False)
 		if p == "-p": print(node.id+ "=", end = " ")
 		ret = Expr_dfs(node.expr1)
-		if ret != id_type:
+		if ret != id_type and id_type != "id":
 			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 	else:	
 		if p == "-p": print(node.id+ "[", end = " ")
@@ -201,7 +201,7 @@ def Assign_dfs(node):
 		Expr_dfs(node.expr1)
 		if p == "-p": print("]=", end = " ")
 		ret = Expr_dfs(node.expr2)
-		if ret != id_type:
+		if ret != id_type and id_type !="id":
 			print("warning: implicit conversion from '%s' to '%s' changes value"%(id_type, ret))
 
 def Callstmt_dfs(node):
