@@ -80,6 +80,7 @@ def Identlist_dfs(node, dec_type):
 	else:
 		identifier_dfs(node.identifier, dec_type, False)
 
+
 def identifier_dfs(node, dec_type, isparam, isarray = False):
 	if dec_type != None:
 		lookup_st(node.id, True, False)
@@ -106,8 +107,10 @@ def identifier_dfs(node, dec_type, isparam, isarray = False):
 	else:
 		if isarray:
 			lookup_st(node.id, False, True)
+			if p == "-p": print(node.id+ "["+ node.intnum+ "]", end ="")
 		else:
 			lookup_st(node.id, False, False)
+			if p == "-p": print(node.id, end = "")
 
 
 
